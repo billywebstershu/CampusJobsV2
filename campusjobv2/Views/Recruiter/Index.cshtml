@@ -1,0 +1,207 @@
+@model campusjobv2.Models.RecruiterViewModel
+@{
+    ViewData["Title"] = "Recruiter Dashboard";
+    ViewData["HeaderType"] = "Recruiter";
+    Layout = "_Layout";
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<div class="container">
+    <div class="box">
+        <input type="radio" class="tab-toggle" name="tab-toggle" id="tab1" checked>
+        <input type="radio" class="tab-toggle" name="tab-toggle" id="tab2">
+        <input type="radio" class="tab-toggle" name="tab-toggle" id="tab3">
+
+        <ul class="tab-list1">
+            <li class="tab-item">
+                <label class="tab-trigger" for="tab1">Pending Shifts</label>
+            </li>
+            <li class="tab-item">
+                <label class="tab-trigger" for="tab2">Approved Shifts</label>
+            </li>
+            <li class="tab-item">
+                <label class="tab-trigger" for="tab3">Create New Shift</label>
+            </li>
+        </ul>
+
+        <div class="tab-container">
+            
+            <div class="tab-content">
+                <div class="subheader">
+                    Pending Shifts
+                </div>
+                <div style="margin-bottom: 15px; margin-top: 10px;">
+                    <input type="text" class="filterbar" id="filterInput1" onkeyup="filterTable('pendingShiftsTable')" placeholder="Search shifts...">
+                </div>
+
+                <table id="pendingShiftsTable" class="table-container">
+                    <thead>
+                        <tr>
+                            <th class="thhead">Shift ID</th>
+                            <th class="thhead">Date</th>
+                            <th class="thhead">Student</th>
+                            <th class="thhead">Visa Status</th>
+                            <th class="thhead">Start Time</th>
+                            <th class="thhead">End Time</th>
+                            <th class="thhead">Duration (hrs)</th>
+                            <th class="thhead">Status</th>
+                            <th class="thhead">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @foreach (var shift in Model.PendingStudentApprovalShifts)
+                        {
+                            <tr>
+                                <td>@shift.ShiftId</td>
+                                <td>@shift.Date.ToString("dd/MM/yy")</td>
+                                <td>@shift.StudentName (ID: @shift.StudentId)</td>
+                                <td>@shift.VisaStatus</td>
+                                <td>@shift.StartTime.ToString("hh:mm tt")</td>
+                                <td>@shift.EndTime.ToString("hh:mm tt")</td>
+                                <td>@shift.Duration</td>
+                                <td>Awaiting Student</td>
+                                <td>
+                                    <form method="post" asp-action="CancelShift" asp-route-id="@shift.ShiftId">
+                                        <button type="submit" class="btn btn-danger">Cancel</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                        
+
+                        @foreach (var shift in Model.PendingAdminApprovalShifts)
+                        {
+                            <tr>
+                                <td>@shift.ShiftId</td>
+                                <td>@shift.Date.ToString("dd/MM/yy")</td>
+                                <td>@shift.StudentName (ID: @shift.StudentId)</td>
+                                <td>@shift.VisaStatus</td>
+                                <td>@shift.StartTime.ToString("hh:mm tt")</td>
+                                <td>@shift.EndTime.ToString("hh:mm tt")</td>
+                                <td>@shift.Duration</td>
+                                <td>Awaiting Admin Review</td>
+                                <td>
+                                    <button class="btn btn-secondary" disabled>No Action</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+
+            <div class="tab-content">
+                <div class="subheader">
+                    Approved Shifts
+                </div>
+                <div style="margin-bottom: 15px; margin-top: 10px;">
+                    <input type="text" class="filterbar" id="filterInput2" onkeyup="filterTable('approvedShiftsTable')" placeholder="Search shifts...">
+                </div>
+
+                <table id="approvedShiftsTable" class="table-container">
+                    <thead>
+                        <tr>
+                            <th class="thhead">Shift ID</th>
+                            <th class="thhead">Date</th>
+                            <th class="thhead">Student</th>
+                            <th class="thhead">Visa Status</th>
+                            <th class="thhead">Start Time</th>
+                            <th class="thhead">End Time</th>
+                            <th class="thhead">Hours Worked</th>
+                            <th class="thhead">Date Approved</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var shift in Model.ApprovedShifts)
+                        {
+                            <tr>
+                                <td>@shift.ShiftId</td>
+                                <td>@shift.Date.ToString("dd/MM/yy")</td>
+                                <td>@shift.StudentName (ID: @shift.StudentId)</td>
+                                <td>@shift.VisaStatus</td>
+                                <td>@shift.StartTime.ToString("hh:mm tt")</td>
+                                <td>@shift.EndTime.ToString("hh:mm tt")</td>
+                                <td>@shift.HoursWorked</td>
+                                <td>@shift.DateApproved.ToString("dd/MM/yy")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+
+            <div class="tab-content">
+                <div class="subheader">Create New Shift</div>
+                <div class="form-container">
+                    <form method="post" asp-action="CreateShift" id="shiftForm">
+                        <div class="form-group">
+                            <label for="StudentId">Student</label>
+                            <select class="form-control" id="StudentId" name="studentId" required>
+                                <option value="">-- Select Student --</option>
+                                @foreach (var student in Model.AvailableStudents)
+                                {
+                                    <option value="@student.StudentId">
+                                        @student.Name (@student.Email)
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="ShiftDate">Date</label>
+                            <input type="date" class="form-control" id="ShiftDate" name="shiftDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="StartTime">Start Time</label>
+                            <input type="time" class="form-control" id="StartTime" name="startTime" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="EndTime">End Time</label>
+                            <input type="time" class="form-control" id="EndTime" name="endTime" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="Duration">Duration (hours)</label>
+                            <input type="number" step="0.1" class="form-control" id="Duration" name="duration" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create Shift</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#StartTime, #EndTime').change(function() {
+                var startTime = $('#StartTime').val();
+                var endTime = $('#EndTime').val();
+                
+                if (startTime && endTime) {
+                    var start = new Date('1970-01-01T' + startTime + 'Z');
+                    var end = new Date('1970-01-01T' + endTime + 'Z');
+                    
+                    if (end < start) {
+                        end.setDate(end.getDate() + 1);
+                    }
+                    
+                    var diffMs = end - start;
+                    var diffHours = diffMs / (1000 * 60 * 60);
+                    
+                    $('#Duration').val(diffHours.toFixed(1));
+                }
+            });
+        });
+
+       
+    </script>
+}

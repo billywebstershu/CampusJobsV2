@@ -1,0 +1,151 @@
+@{
+    ViewData["Title"] = "Homepage";
+}
+
+<head>
+    <style>
+        .container-home {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 0 40px;
+        }
+
+        .image-container-home {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 500px;
+            height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .image-container-home img {
+            position: absolute;
+            width: 100%;
+            object-fit: cover;
+            border-radius: 50px;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: opacity 1s ease, transform 1s ease;
+        }
+
+        .image-container-home img.active-home {
+            opacity: 1 !important;
+            transform: translateX(0) !important;
+        }
+
+        .text-container-home {
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            width: 280px;
+            height: 60px;
+            overflow: hidden;
+            position: relative;
+            white-space: nowrap;
+        }
+
+        .text-home {
+            display: inline;
+            position: relative;
+            transition: transform 0.8s ease;
+            margin-left: 10px;
+        }
+
+        .red-text-home {
+            color: rgba(131, 2, 2, 255);
+        }
+
+        .black-text-home {
+            color: rgba(0, 0, 0, 255);
+        }
+
+        .left-content-home {
+            margin-right: 40px;
+        }
+
+        .right-content-home {
+            margin-left: 30px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container-home">
+        <div class="left-content-home">
+            <img src="Icons/Welcome.png" alt="Welcome" style="width: 200px; height: auto;">
+        </div>
+
+        <div class="image-container-home">
+            <img src="Icons/StudentBoard.jpg" alt="Student Board" class="active-home">
+            <img src="Icons/AdminBoard.png" alt="Admin Board">
+            <img src="Icons/RecruiterBoard.jpg" alt="Recruiter Board">
+        </div>
+
+        <div class="right-content-home">
+            <div class="text-container-home">
+                <span>to the</span>
+                <b class="text-home">
+                    <span class="red-text-home">Student</span>
+                    <span class="black-text-home">Board</span>
+                </b>
+            </div>
+        </div>
+    </div>
+
+    <a href="/Login" class="btn btn-primary" style="width: 150px;">
+        Login
+    </a>
+
+    <script>
+const images = document.querySelectorAll('.image-container-home img');
+const textElement = document.querySelector('.text-home');
+const textOptions = ["Student Board", "Admin Board", "Recruiter Board"];
+let index = 0;
+
+console.log("Images detected:", images); // Debugging: Log detected images
+
+function updateContent() {
+    images.forEach(img => {
+        img.classList.remove('active-home');
+        img.style.opacity = "0"; // Ensure all previous images are hidden
+        img.style.transform = "translateX(100%)";
+    });
+
+    index = (index + 1) % images.length;
+    console.log("Current index:", index, "Image:", images[index]); // Debugging log
+
+    // Apply active class and manually override styles
+    images[index].classList.add('active-home');
+    images[index].style.opacity = "1"; // Ensure visibility
+    images[index].style.transform = "translateX(0)";
+
+    const [firstWord, secondWord] = textOptions[index].split(" ");
+    textElement.style.transform = "translateY(100%)";
+
+    setTimeout(() => {
+        textElement.innerHTML = `<span class="red-text-home">${firstWord}</span> <span class="black-text-home">${secondWord}</span>`;
+        textElement.style.transform = "translateY(0)";
+    }, 400);
+}
+
+// Ensure the first image is visible when the page loads
+document.addEventListener("DOMContentLoaded", () => {
+    images[0].classList.add("active-home");
+    images[0].style.opacity = "1";
+    images[0].style.transform = "translateX(0)";
+});
+
+setInterval(updateContent, 4000);
+
+    </script>
+
+    
+
+</body>
+

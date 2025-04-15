@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Campus Jobs</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    @switch (ViewData["HeaderType"] as string)
+    {
+        case "Student":
+            <div class="headerStudentBoard" style="color: rgba(131,2,2,255);">Student <text style="color: rgba(0,0,0,255);"> Board </text></div>
+            break;
+        case "Recruiter":
+            <div class="headerAdminBoard" style="color: white;"> <text style="color:#e69bb4; font-size: 20px;">Management</text> <br> Recruiter Audit Board </div>
+            break;
+        case "Admin":
+            <div class="headerAdminBoard" style="color: white;"> <text style="color:#e69bb4; font-size: 20px;">Management</text> <br> Admin Audit Board </div>
+            break;
+        default:
+            <div class="headerStudentBoard" style="color: rgba(131,2,2,255);">Campus <text style="color: rgba(0,0,0,255);"> Jobs </text></div>
+            break;
+    }
+
+    <nav>
+        <button class="transparent-button" onclick="window.location.reload();">
+            <img src="~/Icons/reload.png" alt="Refresh" height="30">
+        </button>
+        <a asp-controller="Login" asp-action="Logout" class="icon-align" style="margin-left: 15px;">
+            <img src="~/Icons/logout.png" alt="Logout" class="icon">
+            Logout
+        </a>
+        <ul style="margin-left: auto;">
+            <li class="notification-dropdown">
+                <button class="notification-button icon-align" id="notificationButton">
+                    <img src="~/Icons/notification.png" alt="Notifications" class="icon">
+                    Notifications
+                    <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+                </button>
+                <div class="notification-content" id="notificationContent">
+                    <ul class="notification-list" id="notificationList">
+                        <li>Loading notifications...</li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer>
+        <text style="padding-left: 2%;"> Campus </text> <text style="float: right; padding-right: 2%;"> Copyright 2025 </text>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/script.js" asp-append-version="true"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

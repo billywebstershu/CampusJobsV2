@@ -1,0 +1,67 @@
+@model List<campusjobv2.Models.TimeSheetsViewModel.Notification>
+
+<div class="notification-dropdown">
+    <button class="notification-button">
+        <img src="~/Icons/notification.png" alt="Notifications" height="25">
+        @if (Model.Any(n => !n.IsRead))
+        {
+            <span class="notification-badge">@Model.Count(n => !n.IsRead)</span>
+        }
+    </button>
+    <div class="notification-content" style="display: none;">
+        @if (Model.Any())
+        {
+            <ul class="notification-list">
+                @foreach (var notification in Model)
+                {
+                    <li class="notification-item @(notification.IsRead ? "read" : "unread")" 
+                        data-notification-id="@notification.Id">
+                        <p>@notification.Message</p>
+                        <small class="time">@notification.Time.ToString("g")</small>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p>No notifications</p>
+        }
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        // Notification dropdown toggle
+        $('.notification-button').click(function(e) {
+            e.stopPropagation();
+            $('.notification-content').toggle();
+        });
+
+        // Mark notification as read when clicked
+        $('.notification-item').click(function() {
+            var notificationId = $(this).data('notification-id');
+            var item = $(this);
+            
+            $.post('/TimeSheets/MarkNotificationAsRead', { notificationId: notificationId }, function() {
+                item.removeClass('unread').addClass('read');
+                updateNotificationBadge();
+            });
+        });
+
+        // Close dropdown when clicking elsewhere
+        $(document).click(function() {
+            $('.notification-content').hide();
+        });
+
+        function updateNotificationBadge() {
+            var unreadCount = $('.notification-item.unread').length;
+            var badge = $('.notification-badge');
+            
+            if (unreadCount > 0) {
+                badge.text(unreadCount).show();
+            } else {
+                badge.hide();
+            }
+        }
+    });
+</script>

@@ -1,0 +1,207 @@
+@model campusjobv2.Models.AdminViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    ViewData["HeaderType"] = "Admin";
+    Layout = "_Layout";
+}
+
+<div class="container">
+    <div class="box">
+        <input type="radio" class="tab-toggle" name="tab-toggle" id="tab1" checked>
+        <input type="radio" class="tab-toggle" name="tab-toggle" id="tab2">
+        <input type="radio" class="tab-toggle" name="tab-toggle" id="tab3">
+
+        <ul class="tab-list1">
+            <li class="tab-item">
+                <label class="tab-trigger" for="tab1">Pending Shifts</label>
+            </li>
+            <li class="tab-item">
+                <label class="tab-trigger" for="tab2">Student Account Creation</label>
+            </li>
+            <li class="tab-item">
+                <label class="tab-trigger" for="tab3">User Search</label>
+            </li>
+        </ul>
+
+        <div class="tab-container">
+
+            <div class="tab-content">
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success">@TempData["Success"]</div>
+                }
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger">@TempData["Error"]</div>
+                }
+
+                <div class="subheader">
+                    Pending Shifts
+                </div>
+                <div style="margin-bottom: 15px; margin-top: 10px;">
+                    <input type="text" class="filterbar" id="filterInput" onkeyup="filterTable()" placeholder="Search shifts...">
+                </div>
+
+                <table id="pendingShiftsTable" class="table-container">
+                    <thead>
+                        <tr>
+                            <th class="thhead">Shift ID</th>
+                            <th class="thhead">Student</th>
+                            <th class="thhead">Recruiter</th>
+                            <th class="thhead">Date</th>
+                            <th class="thhead">Hours</th>
+                            <th class="thhead">Date Offered</th>
+                            <th class="thhead">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var shift in Model.PendingShifts)
+                        {
+                            <tr>
+                                <td>@shift.ShiftId</td>
+                                <td>@shift.StudentName (ID: @shift.StudentId)</td>
+                                <td>@shift.Recruiter</td>
+                                <td>@shift.Date.ToString("dd/MM/yy")</td>
+                                <td>@shift.Hours</td>
+                                <td>@shift.DateOffered.ToString("dd/MM/yy")</td>
+                                <td>
+                                    <form method="post" asp-action="ApproveShift">
+                                        <input type="hidden" name="shiftId" value="@shift.ShiftId" />
+                                        <button type="submit" class="btn btn-success">Approve</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="tab-content">
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success">@TempData["Success"]</div>
+                }
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger">@TempData["Error"]</div>
+                }
+
+                <div class="form-container">
+                    <form asp-action="CreateStudentAccount" method="post">
+                        <div class="form-group">
+                            <label asp-for="StudentAccount.FirstName">First Name</label>
+                            <input asp-for="StudentAccount.FirstName" class="form-control" />
+                            <span asp-validation-for="StudentAccount.FirstName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="StudentAccount.LastName">Last Name</label>
+                            <input asp-for="StudentAccount.LastName" class="form-control" />
+                            <span asp-validation-for="StudentAccount.LastName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="StudentAccount.Email">Email</label>
+                            <input asp-for="StudentAccount.Email" class="form-control" />
+                            <span asp-validation-for="StudentAccount.Email" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="StudentAccount.Department">Department</label>
+                            <input asp-for="StudentAccount.Department" class="form-control" />
+                            <span asp-validation-for="StudentAccount.Department" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="StudentAccount.RecruiterId">Recruiter</label>
+                            <select asp-for="StudentAccount.RecruiterId" 
+                                    asp-items="Model.StudentAccount.AvailableRecruiters" 
+                                    class="form-control" required>
+                                <option value="">-- Select Recruiter --</option>
+                            </select>
+                            <span asp-validation-for="StudentAccount.RecruiterId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="StudentAccount.IsVisaRestricted">
+                                <input asp-for="StudentAccount.IsVisaRestricted" id="visaCheckbox" /> Visa Restricted
+                            </label>
+                        </div>
+                        <div class="form-group" id="visaExpiryGroup" style="@(Model.StudentAccount.IsVisaRestricted ? "" : "display:none")">
+                            <label asp-for="StudentAccount.VisaExpiryDate">Visa Expiry Date</label>
+                            <input asp-for="StudentAccount.VisaExpiryDate" type="date" class="form-control" />
+                            <span asp-validation-for="StudentAccount.VisaExpiryDate" class="text-danger"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create Account</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="tab-content">
+                <div class="search-container">
+                    <div class="subheader">
+                        User Search
+                    </div>
+                    
+                    <form method="get" asp-action="Index" class="search-form">
+                        <div class="form-group" style="display: flex; gap: 10px; margin-bottom: 20px;">
+                            <input type="text" class="form-control" name="searchTerm" value="@Model.SearchTerm" placeholder="Search by name or email" style="flex: 1;">
+                            <button type="submit" class="btn btn-primary" style="margin-left: 10px; white-space: nowrap;">Search</button>
+                        </div>
+                    </form>
+
+                    @if (Model.SearchResults != null)
+                    {
+                        if (Model.SearchResults.Any())
+                        {
+                            <table class="table-container">
+                                <thead>
+                                    <tr>
+                                        <th class="thhead">Name</th>
+                                        <th class="thhead">Email</th>
+                                        <th class="thhead">Role</th>
+                                        <th class="thhead">Documents</th>
+                                        <th class="thhead">Visa Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var user in Model.SearchResults)
+                                    {
+                                        <tr>
+                                            <td>@user.FirstName @user.LastName</td>
+                                            <td>@user.Email</td>
+                                            <td>@user.Role</td>
+                                            <td>
+                                                @if (user.HasDocuments) {
+                                                    <button class="btn btn-secondary" disabled>View Right To Work Documents</button>
+                                                } else {
+                                                    <button class="btn btn-secondary" disabled>Upload Right To Work Documents</button>
+                                                }
+                                            </td>
+                                            <td>@(user.VisaStatus ? "Student Has 15 Hour Work Limit" : "Student Has No Visa Restrictions")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <div class="alert alert-info">No users found matching your search criteria</div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#visaCheckbox').change(function() {
+                if(this.checked) {
+                    $('#visaExpiryGroup').show();
+                } else {
+                    $('#visaExpiryGroup').hide();
+                }
+            });
+            
+         
+    </script>
+    <partial name="_ValidationScriptsPartial" />
+}

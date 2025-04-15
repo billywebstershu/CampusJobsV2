@@ -1,0 +1,137 @@
+@model campusjobv2.Models.TimeSheetsViewModel
+@{
+    ViewData["Title"] = "Your Shifts";
+    ViewData["HeaderType"] = "Student";
+    Layout = "_Layout";
+}
+
+<div class="student-timesheets-container">
+    <div class="student-dashboard">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">@TempData["Success"]</div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">@TempData["Error"]</div>
+        }
+
+        <h2 class="student-shifts-title">Your Shifts</h2>
+        
+
+        <div class="shift-section">
+            <h3 class="shift-section-title">Confirmed Shifts</h3>
+            @if (Model.ConfirmedShifts.Any())
+            {
+                <table class="shift-table confirmed-shifts">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Hours</th>
+                            <th>Recruiter</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var shift in Model.ConfirmedShifts)
+                        {
+                            <tr>
+                                <td>@shift.Date.ToString("dd/MM/yy")</td>
+                                <td>@shift.StartTime.ToString("h:mm tt") - @shift.EndTime.ToString("h:mm tt")</td>
+                                <td>@shift.TotalHours</td>
+                                <td>@shift.Recruiter</td>
+                                <td><span class="badge badge-success">Confirmed</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="no-shifts-message">No confirmed shifts</div>
+            }
+        </div>
+
+
+        <div class="shift-section">
+            <h3 class="shift-section-title">Available Shifts</h3>
+            @if (Model.AvailableShifts.Any())
+            {
+                <table class="shift-table available-shifts">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Hours</th>
+                            <th>Recruiter</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var shift in Model.AvailableShifts)
+                        {
+                            <tr>
+                                <td>@shift.Date.ToString("dd/MM/yy")</td>
+                                <td>@shift.StartTime.ToString("h:mm tt") - @shift.EndTime.ToString("h:mm tt")</td>
+                                <td>@shift.TotalHours</td>
+                                <td>@shift.Recruiter</td>
+                                <td><span class="badge badge-primary">Available</span></td>
+                                <td class="action-buttons">
+                                    <form method="post" asp-action="AcceptShift">
+                                        <input type="hidden" name="shiftId" value="@shift.ShiftId" />
+                                        <button type="submit" class="btn btn-success btn-sm">Accept</button>
+                                    </form>
+                                    <form method="post" asp-action="DeclineShift">
+                                        <input type="hidden" name="shiftId" value="@shift.ShiftId" />
+                                        <button type="submit" class="btn btn-danger btn-sm">Decline</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="no-shifts-message">No available shifts</div>
+            }
+        </div>
+
+
+        <div class="shift-section">
+            <h3 class="shift-section-title">Pending Approval</h3>
+            @if (Model.PendingApprovalShifts.Any())
+            {
+                <table class="shift-table pending-shifts">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Hours</th>
+                            <th>Recruiter</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var shift in Model.PendingApprovalShifts)
+                        {
+                            <tr>
+                                <td>@shift.Date.ToString("dd/MM/yy")</td>
+                                <td>@shift.StartTime.ToString("h:mm tt") - @shift.EndTime.ToString("h:mm tt")</td>
+                                <td>@shift.TotalHours</td>
+                                <td>@shift.Recruiter</td>
+                                <td><span class="badge badge-warning">Pending Approval</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="no-shifts-message">No shifts pending approval</div>
+            }
+        </div>
+    </div>
+</div>

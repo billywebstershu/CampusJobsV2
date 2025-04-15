@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="../build/campusjobv2.props" />
+</Project>
