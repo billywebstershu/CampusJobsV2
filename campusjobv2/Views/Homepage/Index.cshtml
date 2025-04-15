@@ -120,7 +120,7 @@ function updateContent() {
     index = (index + 1) % images.length;
     console.log("Current index:", index, "Image:", images[index]); // Debugging log
 
-    // Apply active class and manually override styles
+ 
     images[index].classList.add('active-home');
     images[index].style.opacity = "1"; // Ensure visibility
     images[index].style.transform = "translateX(0)";
@@ -134,7 +134,7 @@ function updateContent() {
     }, 400);
 }
 
-// Ensure the first image is visible when the page loads
+
 document.addEventListener("DOMContentLoaded", () => {
     images[0].classList.add("active-home");
     images[0].style.opacity = "1";
